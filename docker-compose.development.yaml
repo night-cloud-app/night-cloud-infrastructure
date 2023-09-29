@@ -3,8 +3,8 @@ services:
   authentication-microservice-api:
     container_name: authentication-microservice-api
     build:
-      context: ../Backend
-      dockerfile: ../Backend/Microservices/Authentication/src/Authentication.Presentation/Dockerfile
+      context: ../backend
+      dockerfile: ../backend/microservices/authentication/src/Authentication.Presentation/Dockerfile
     ports:
       - "5001:80"
     networks:
@@ -31,8 +31,8 @@ services:
   files-microservice-api:
     container_name: files-microservice-api
     build:
-      context: ../Backend
-      dockerfile: ../Backend/Microservices/Files/src/Files.Presentation/Dockerfile
+      context: ../backend
+      dockerfile: ../backend/microservices/files/src/Files.Presentation/Dockerfile
     ports:
       - "5002:80"
     networks:
@@ -64,8 +64,8 @@ services:
   storage-microservice-api:
     container_name: storage-microservice-api
     build:
-      context: ../Backend
-      dockerfile: ../Backend/Microservices/Storage/Storage.API/Dockerfile
+      context: ../backend
+      dockerfile: ../backend/microservices/storage/Storage.API/Dockerfile
     ports:
       - "5003:80"
     environment:
@@ -83,8 +83,8 @@ services:
   ocelot-api-gateway:
     container_name: ocelot-api-gateway
     build:
-      context: ../Backend
-      dockerfile: ../Backend/ApiGateways/OcelotApiGateway/Dockerfile
+      context: ../backend
+      dockerfile: ../backend/api-gateways/ocelot-api-gateway/OcelotApiGateway/Dockerfile
     ports:
       - "5004:80"
     environment:
