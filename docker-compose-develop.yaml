@@ -2,7 +2,7 @@ version: "3.9"
 services:
   authentication-microservice-api:
     container_name: authentication-microservice-api
-    image: ${DOCKER_REGISTRY}/authentication-microservice-api:latest
+    image: ${DOCKER_REGISTRY}/develop/authentication-microservice-api:latest
     ports:
       - "5001:80"
     networks:
@@ -28,7 +28,7 @@ services:
   
   files-microservice-api:
     container_name: files-microservice-api
-    image: ${DOCKER_REGISTRY}/files-microservice-api:latest
+    image: ${DOCKER_REGISTRY}/develop/files-microservice-api:latest
     ports:
       - "5002:80"
     networks:
@@ -59,7 +59,7 @@ services:
   
   storage-microservice-api:
     container_name: storage-microservice-api
-    image: ${DOCKER_REGISTRY}/storage-microservice-api:latest
+    image: ${DOCKER_REGISTRY}/develop/storage-microservice-api:latest
     ports:
       - "5003:80"
     environment:
@@ -76,9 +76,11 @@ services:
   
   ocelot-api-gateway:
     container_name: ocelot-api-gateway
-    image: ${DOCKER_REGISTRY}/ocelot-api-gateway:latest
+    image: ${DOCKER_REGISTRY}/develop/ocelot-api-gateway:latest
     ports:
       - "5004:80"
+    environment:
+      - AuthenticationMicroservice__ValidateTokenPath=${ AUTH_VALIDATE_TOKEN_PATH }
     volumes:
       - logs:/logs
     networks: 
