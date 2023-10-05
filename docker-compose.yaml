@@ -2,15 +2,15 @@ version: "3.9"
 services:
   authentication-microservice-api:
     container_name: authentication-microservice-api
-    image: ${DOCKER_REGISTRY}/develop/authentication-microservice-api:latest
+    image: ${DOCKER_REGISTRY}/${REGISTRY_USERNAME}/develop/authentication-microservice-api:latest
     ports:
       - "5001:80"
     networks:
       - authentication-microservice-network
       - ocelot-gateway-network
     environment:
-      ConnectionStrings__PostgresDatabase: ${ AUTHENTICATION_MICROSERVICE_DATABASE_CONNECTIONSTRING }
-      JWT__Secret: ${ JWT_SECRET }
+      ConnectionStrings__PostgresDatabase: ${AUTHENTICATION_MICROSERVICE_DATABASE_CONNECTIONSTRING}
+      JWT__Secret: ${JWT_SECRET}
     volumes:
       - logs:/logs
 
@@ -23,12 +23,12 @@ services:
     networks: 
       - authentication-microservice-network
     environment:
-      POSTGRES_PASSWORD: ${ AUTHENTICATION_MICROSERVICE_DATABASE_POSTGRES_PASSWORD }
-      POSTGRES_USER: ${ AUTHENTICATION_MICROSERVICE_DATABASE_POSTGRES_USER }
+      POSTGRES_PASSWORD: ${AUTHENTICATION_MICROSERVICE_DATABASE_POSTGRES_PASSWORD}
+      POSTGRES_USER: ${AUTHENTICATION_MICROSERVICE_DATABASE_POSTGRES_USER}
   
   files-microservice-api:
     container_name: files-microservice-api
-    image: ${DOCKER_REGISTRY}/develop/files-microservice-api:latest
+    image: ${DOCKER_REGISTRY}/${REGISTRY_USERNAME}/develop/files-microservice-api:latest
     ports:
       - "5002:80"
     networks:
@@ -36,9 +36,9 @@ services:
       - ocelot-gateway-network
       - rabbit-mq-network
     environment:
-      ConnectionStrings__PostgresDatabase: ${ FILES_MICROSERVICE_DATABASE_CONNECTION_STRING }
-      JWT__Secret: ${ JWT_SECRET }
-      RabbitMQ__Host: ${RABBIT_MQ_HOST}
+      ConnectionStrings__PostgresDatabase: ${FILES_MICROSERVICE_DATABASE_CONNECTION_STRING}
+      JWT__Secret: ${JWT_SECRET}
+      RabbitMQ__Host: ${RABBIT_MQ_CONNECTION_HOSTNAME}
       RabbitMQ__Username: ${RABBIT_MQ_USERNAME}
       RabbitMQ__Password: ${RABBIT_MQ_PASSWORD}
       RabbitMQ__VirtualHost: ${RABBIT_MQ_VIRTUAL_HOST}
@@ -54,20 +54,20 @@ services:
     networks:
       - files-microservice-network
     environment:
-      POSTGRES_PASSWORD: ${ FILES_MICROSERVICE_DATABASE_POSTGRES_PASSWORD }
-      POSTGRES_USER: ${ FILES_MICROSERVICE_DATABASE_POSTGRES_USER }
+      POSTGRES_PASSWORD: ${FILES_MICROSERVICE_DATABASE_POSTGRES_PASSWORD}
+      POSTGRES_USER: ${FILES_MICROSERVICE_DATABASE_POSTGRES_USER}
   
   storage-microservice-api:
     container_name: storage-microservice-api
-    image: ${DOCKER_REGISTRY}/develop/storage-microservice-api:latest
+    image: ${DOCKER_REGISTRY}/${REGISTRY_USERNAME}/develop/storage-microservice-api:latest
     ports:
       - "5003:80"
     environment:
-      Storage__Path: ${ STORAGE_MICROSERVICE_STORAGE_PATH }
-      RabbitMQ__Host: ${ RABBIT_MQ_HOSTNAME }
-      RabbitMQ__Username: ${ RABBIT_MQ_USERNAME }
-      RabbitMQ__Password: ${ RABBIT_MQ_PASSWORD }
-      RabbitMQ__VirtualHost: ${ RABBIT_MQ_VIRTUAL_HOST }
+      Storage__Path: ${STORAGE_MICROSERVICE_STORAGE_PATH}
+      RabbitMQ__Host: ${RABBIT_MQ_CONNECTION_HOSTNAME}
+      RabbitMQ__Username: ${RABBIT_MQ_USERNAME}
+      RabbitMQ__Password: ${RABBIT_MQ_PASSWORD}
+      RabbitMQ__VirtualHost: ${RABBIT_MQ_VIRTUAL_HOST}
     volumes:
       - storage-microservice-volume:/app/storage/files
       - logs:/logs
@@ -76,19 +76,21 @@ services:
   
   ocelot-api-gateway:
     container_name: ocelot-api-gateway
-    image: ${DOCKER_REGISTRY}/develop/ocelot-api-gateway:latest
+    image: ${DOCKER_REGISTRY}/${REGISTRY_USERNAME}/develop/ocelot-api-gateway:latest
     ports:
       - "5004:80"
     environment:
-      - AuthenticationMicroservice__ValidateTokenPath=${ AUTH_VALIDATE_TOKEN_PATH }
+      - AuthenticationMicroservice__ValidateTokenPath=${AUTH_VALIDATE_TOKEN_PATH}
+      - Ocelot__Host=${HOST}
     volumes:
       - logs:/logs
     networks: 
       - ocelot-gateway-network
   
   rabbitmq:
-    image: masstransit/rabbitmq
-    hostname: ${ RABBIT_MQ_HOSTNAME }
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: ${RABBIT_MQ_HOSTNAME}
     restart: always
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBIT_MQ_USERNAME}
@@ -96,8 +98,8 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
-    networks: 
-      - rabbit-mq-network
+    volumes:
+      - ./.rabbitmq/data/:/var/lib/rabbitmq
 
 networks:
   authentication-microservice-network:
